@@ -11,11 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cities', function (Blueprint $table) {
+        Schema::create('weather.cities', function (Blueprint $table) {
             $table->uuid()->primary();
             $table->string('name')->unique();
-            $table->double('lat')->nullable();
-            $table->double('lon')->nullable();
+            $table->double('lat', 2, 7);
+            $table->double('lon', 3, 7);
+            $table->string('country')->nullable();
+            $table->bigInteger('population')->nullable();
+            $table->integer('timezone')->nullable()->comment('Сдвиг в секундах');
+            $table->timestamp('sunrise')->nullable();
+            $table->timestamp('sunset')->nullable();
+            $table->index(['lat', 'lon']);
             $table->timestamps();
         });
     }
@@ -25,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cities');
+        Schema::dropIfExists('weather.cities');
     }
 };

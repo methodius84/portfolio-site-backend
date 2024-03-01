@@ -30,5 +30,13 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
+    'yandex_weather' => [
+        'key' => env('YANDEX_API_KEY'),
+        'base_uri' => 'https://api.weather.yandex.ru/graphql/query'
+    ],
+    'open_weather_map' => [
+        'key' => env('OPEN_WEATHER_MAP_KEY'),
+        'base_uri' => 'https://api.openweathermap.org/data/2.5/',
+        'units' => 'metric',
+    ],
 ];
