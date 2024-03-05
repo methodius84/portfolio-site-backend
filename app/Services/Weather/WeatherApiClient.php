@@ -7,6 +7,7 @@ use App\DTO\Weather\ForecastDTO;
 use App\DTO\Weather\QueryParamsDTO;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
 use function PHPUnit\Framework\matches;
 
 class WeatherApiClient implements ApiClientInterface
@@ -29,13 +30,11 @@ class WeatherApiClient implements ApiClientInterface
         } catch (GuzzleException $e) {
             return $e->getMessage();
         }
-        if ($response->getStatusCode() === 200) {
-            $data = $response->getBody()->getContents();
-            $data = json_decode($data);
-            return match($params->getMethod()) {
-                'forecast' => new ForecastDTO($data),
-                'weather' => new CurrentWeatherDTO($data),
-            };
-        }
+        $data = $response->getBody()->getContents();
+        $data = json_decode($data);
+        return match($params->getMethod()) {
+            'forecast' => new ForecastDTO($data),
+            'weather' => new CurrentWeatherDTO($data),
+        };
     }
 }

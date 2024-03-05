@@ -4,6 +4,7 @@ namespace App\Models\Weather;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class City extends WeatherModel
 {
@@ -13,5 +14,20 @@ class City extends WeatherModel
         'name',
         'lat',
         'lon',
+        'country',
+        'population',
+        'timezone',
+        'sunrise',
+        'sunset',
     ];
+
+    protected $casts = [
+        'sunrise' => 'datetime',
+        'sunset' => 'datetime',
+    ];
+
+    public function forecasts(): HasMany
+    {
+        return $this->hasMany(CityForecasts::class, 'city_uuid', 'uuid');
+    }
 }

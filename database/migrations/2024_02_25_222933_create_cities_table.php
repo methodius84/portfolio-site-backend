@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('weather.cities', function (Blueprint $table) {
             $table->uuid()->primary();
             $table->string('name')->unique();
-            $table->double('lat', 2, 7);
-            $table->double('lon', 3, 7);
+            $table->float('lat', 8, 6);
+            $table->float('lon', 9, 6);
             $table->string('country')->nullable();
             $table->bigInteger('population')->nullable();
             $table->integer('timezone')->nullable()->comment('Сдвиг в секундах');
             $table->timestamp('sunrise')->nullable();
             $table->timestamp('sunset')->nullable();
-            $table->index(['lat', 'lon']);
+            $table->index(['lon', 'lat']);
             $table->timestamps();
         });
     }

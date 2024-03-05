@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('cloudiness');
             $table->decimal('wind_speed');
             $table->integer('wind_degree');
-            $table->decimal('wind_gust');
+            $table->decimal('wind_gust')->nullable();
             $table->enum('daytime',['d','n']);
             $table->integer('visibility');
             $table->smallInteger('pop')->nullable()->comment('Вероятность осадков');

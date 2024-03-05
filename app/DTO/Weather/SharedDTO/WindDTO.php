@@ -6,13 +6,13 @@ class WindDTO
 {
     private float $speed;
     private int $degree;
-    private float $gust;
+    private ?float $gust;
 
     public function __construct(object $wind)
     {
         $this->speed = $wind->speed;
         $this->degree = $wind->deg;
-        $this->gust = $wind->gust;
+        $this->gust = $wind->gust ?? null;
     }
 
     /**

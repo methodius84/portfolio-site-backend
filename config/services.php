@@ -37,6 +37,7 @@ return [
     'open_weather_map' => [
         'key' => env('OPEN_WEATHER_MAP_KEY'),
         'base_uri' => 'https://api.openweathermap.org/data/2.5/',
+        'base_geocode_uri' => 'https://api.openweathermap.org/geo/1.0/',
         'units' => 'metric',
     ],
 ];
