@@ -51,7 +51,6 @@ class GetForecastCommand extends Command
             $query = new DirectGeocodeQueryDTO($city);
             /** @var ResponseDTO $response */
             $response = $client->setClient('geocode')->execute($query);
-//            print_r($response);
 
             $location = $response->getLocations()[0];
 
@@ -69,7 +68,6 @@ class GetForecastCommand extends Command
 
             /** @var CurrentWeatherDTO $weather */
             $weather = $client->setClient()->execute($query);
-            print_r($weather);
             $model->update([
                 'timezone' => $weather->getTimezone(),
                 'sunrise' => $weather->getSunrise(),

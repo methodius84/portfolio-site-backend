@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Resources\CityCollection;
+use App\Models\Weather\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,14 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::prefix('weather')->group(function () {
         Route::get('cities', function () {
-            return new \Illuminate\Http\JsonResponse([
-                'Cities' => [
-                    ['id' => 1, 'name' => 'Moscow'],
-                    ['id' => 2, 'name' => 'Saint-Petersburg'],
-                    ['id' => 3, 'name' => 'Volgograd'],
-                    ['id' => 4, 'name' => 'Novosibirsk'],
-                ]
-            ], 200);
+            return new CityCollection(City::all());
         })->name('cities');
     });
 });
