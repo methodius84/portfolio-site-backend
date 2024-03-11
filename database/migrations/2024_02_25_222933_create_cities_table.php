@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('weather.cities', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->string('name')->unique();
+            $table->string('name');
+            $table->string('name_ru')->nullable();
             $table->float('lat', 8, 6);
             $table->float('lon', 9, 6);
-            $table->string('country')->nullable();
-            $table->bigInteger('population')->nullable();
+            $table->string('country');
             $table->integer('timezone')->nullable()->comment('Сдвиг в секундах');
             $table->timestamp('sunrise')->nullable();
             $table->timestamp('sunset')->nullable();
             $table->index(['lon', 'lat']);
+            $table->unique(['name', 'country']);
             $table->timestamps();
         });
     }

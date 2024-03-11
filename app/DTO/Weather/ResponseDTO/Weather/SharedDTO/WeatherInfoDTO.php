@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Weather\SharedDTO;
+namespace App\DTO\Weather\ResponseDTO\Weather\SharedDTO;
 
 class WeatherInfoDTO
 {
@@ -11,6 +11,10 @@ class WeatherInfoDTO
     private readonly WindDTO $wind;
     private readonly int $visibility;
     private readonly ?float $pop;
+    /**
+     * @var string|null Part of the day(d | n)
+     */
+    private readonly ?string $pod;
 
     public function __construct(object $info)
     {
@@ -21,6 +25,7 @@ class WeatherInfoDTO
         $this->wind = new WindDTO($info->wind);
         $this->visibility = $info->visibility;
         $this->pop = $info->pop ?? null;
+        $this->pod = $info->sys->pod ?? null;
     }
 
     public function getTimestamp(): int
@@ -53,9 +58,24 @@ class WeatherInfoDTO
         return $this->visibility;
     }
 
+    /**
+     * Только для прогнозов погоды
+     *
+     * Вероятность осадков(от 0 до 1, где 0 это 0%, 1 - 100%)
+     * @return float|null
+     */
     public function getPop(): ?float
     {
         return $this->pop;
+    }
+
+    /**
+     * Только для прогнозов погоды
+     * @return string|null Part of the day(d | n)
+     */
+    public function getPod(): ?string
+    {
+        return $this->pod;
     }
 
 }

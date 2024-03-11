@@ -1,8 +1,10 @@
 <?php
 
-namespace App\DTO\Weather;
+namespace App\DTO\Weather\QueryDTO\Weather;
 
-class QueryParamsDTO
+use App\DTO\Weather\QueryDTO\BuildQueryInterface;
+
+class WeatherQueryDTO implements BuildQueryInterface
 {
     private readonly string $method;
     private readonly float $lat;
@@ -37,7 +39,7 @@ class QueryParamsDTO
         return $this->units;
     }
 
-    public function formQuery(): string
+    public function buildQuery(): string
     {
         return $this->method . '?lat=' . $this->lat . '&lon=' . $this->lon . '&units=' . $this->units;
     }

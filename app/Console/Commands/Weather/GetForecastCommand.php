@@ -2,13 +2,18 @@
 
 namespace App\Console\Commands\Weather;
 
-use App\DTO\Weather\CurrentWeatherDTO;
-use App\DTO\Weather\ForecastDTO;
-use App\DTO\Weather\QueryParamsDTO;
+use App\DTO\Weather\QueryDTO\Geocode\DirectGeocodeQueryDTO;
+use App\DTO\Weather\QueryDTO\Weather\WeatherQueryDTO;
+use App\DTO\Weather\ResponseDTO\Geocode\ResponseDTO;
+use App\DTO\Weather\ResponseDTO\Weather\CurrentWeatherDTO;
+use App\DTO\Weather\ResponseDTO\Weather\ForecastDTO;
+use App\DTO\Weather\ResponseDTO\Weather\SharedDTO\WeatherInfoDTO;
 use App\Models\Weather\City;
+use App\Models\Weather\CityForecast;
+use App\Models\Weather\CityCurrentWeather;
 use App\Services\Weather\WeatherApiClient;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
 class GetForecastCommand extends Command
 {
@@ -34,49 +39,89 @@ class GetForecastCommand extends Command
         $client = new WeatherApiClient();
 
         $cities = [
-            'Moscow' => [
-                'lat' => 55.751244,
-                'lon' => 37.618423,
-            ],
-            'New York' => [
-                'lat' => 40.730610,
-                'lon' => -73.935242
-            ],
-            'London' => [
-                'lat' => 51.509865,
-                'lon' => -0.118092
-            ],
-            'Saint Petersburg' => [
-                'lat' => 59.937500,
-                'lon' => 30.308611
-            ],
-            'Paris' => [
-                'lat' => 48.864716,
-                'lon' => 2.349014
-            ],
-            'Volgograd' => [
-                'lat' => 48.700001,
-                'lon' => 44.516666
-            ],
+            'Moscow,RU',
+            'New York,US',
+            'London,GB',
+            'Saint Petersburg,RU',
+            'Paris,FR',
+            'Volgograd,RU'
         ];
 
-        foreach ($cities as $key => $city) {
-            $query = new QueryParamsDTO('weather', $city['lat'], $city['lon']);
-            /** @var CurrentWeatherDTO $response */
-            $response = $client->execute($query);
-            if ($response->getCode() === 200) {
-                City::query()->updateOrCreate([
-                    'lat' => $city['lat'],
-                    'lon' => $city['lon'],
-                ], [
-                    'name' => $response->getCityName(),
-                    'lat' => $city['lat'],
-                    'lon' => $city['lon'],
-                    'country' => $response->getCountry(),
-                    'timezone' => $response->getTimezone(),
-                    'sunrise' => $response->getSunrise() + $response->getTimezone(),
-                    'sunset' => $response->getSunset() + $response->getTimezone(),
-                ]);
+        foreach ($cities as $city) {
+            $query = new DirectGeocodeQueryDTO($city);
+            /** @var ResponseDTO $response */
+            $response = $client->setClient('geocode')->execute($query);
+//            print_r($response);
+
+            $location = $response->getLocations()[0];
+
+            City::query()->updateOrCreate([
+                'name' => $location->getLocalNames()->en ?? $location->getName(),
+                'country' => $location->getCountry()
+            ], [
+                'name_ru' => $location->getLocalNames()->ru ?? null,
+                'lat' => $location->getLat(),
+                'lon' => $location->getLon(),
+            ]);
+
+            $model = City::query()->where('lat', $location->getLat())->where('lon', $location->getLon())->first();
+            $query = new WeatherQueryDTO('weather', $model->lat, $model->lon);
+
+            /** @var CurrentWeatherDTO $weather */
+            $weather = $client->setClient()->execute($query);
+            print_r($weather);
+            $model->update([
+                'timezone' => $weather->getTimezone(),
+                'sunrise' => $weather->getSunrise(),
+                'sunset' => $weather->getSunset(),
+            ]);
+            $model->refresh();
+            CityCurrentWeather::query()->updateOrCreate([
+                'city_uuid' => $model->uuid,
+            ], [
+                'temperature' => $weather->getWeatherInfo()->getWeatherParameters()->getTemperature(),
+                'feels_like' => $weather->getWeatherInfo()->getWeatherParameters()->getFeelsLike(),
+                'temp_min' => $weather->getWeatherInfo()->getWeatherParameters()->getTempMin(),
+                'temp_max' => $weather->getWeatherInfo()->getWeatherParameters()->getTempMax(),
+                'pressure' => $weather->getWeatherInfo()->getWeatherParameters()->getPressure(),
+                'humidity' => $weather->getWeatherInfo()->getWeatherParameters()->getHumidity(),
+                'cloudiness' => $weather->getWeatherInfo()->getCloudiness()->getCloudiness(),
+                'wind_speed' => $weather->getWeatherInfo()->getWind()->getSpeed(),
+                'wind_degree' => $weather->getWeatherInfo()->getWind()->getDegree(),
+                'wind_gust' => $weather->getWeatherInfo()->getWind()->getGust(),
+                'visibility' => $weather->getWeatherInfo()->getVisibility(),
+                'weather' => $weather->getWeatherInfo()->getWeather()->getMain(),
+                'weather_description' => $weather->getWeatherInfo()->getWeather()->getDescription(),
+            ]);
+
+            $query = new WeatherQueryDTO('forecast', $model->lat, $model->lon);
+            /** @var ForecastDTO $forecasts */
+            $forecasts = $client->execute($query);
+
+            if ($forecasts->getWeatherInfos()) {
+                /** @var WeatherInfoDTO $forecast */
+                foreach ($forecasts->getWeatherInfos() as $forecast) {
+                    CityForecast::query()->updateOrCreate([
+                        'city_uuid' => $model->uuid,
+                        'date' => $forecast->getTimestamp()
+                    ], [
+                        'temperature' => $weather->getWeatherInfo()->getWeatherParameters()->getTemperature(),
+                        'feels_like' => $weather->getWeatherInfo()->getWeatherParameters()->getFeelsLike(),
+                        'temp_min' => $weather->getWeatherInfo()->getWeatherParameters()->getTempMin(),
+                        'temp_max' => $weather->getWeatherInfo()->getWeatherParameters()->getTempMax(),
+                        'pressure' => $weather->getWeatherInfo()->getWeatherParameters()->getPressure(),
+                        'humidity' => $weather->getWeatherInfo()->getWeatherParameters()->getHumidity(),
+                        'cloudiness' => $weather->getWeatherInfo()->getCloudiness()->getCloudiness(),
+                        'wind_speed' => $weather->getWeatherInfo()->getWind()->getSpeed(),
+                        'wind_degree' => $weather->getWeatherInfo()->getWind()->getDegree(),
+                        'wind_gust' => $weather->getWeatherInfo()->getWind()->getGust(),
+                        'daytime' => $forecast->getPod(),
+                        'visibility' => $weather->getWeatherInfo()->getVisibility(),
+                        'pop' => $forecast->getPop(),
+                        'weather' => $weather->getWeatherInfo()->getWeather()->getMain(),
+                        'weather_description' => $weather->getWeatherInfo()->getWeather()->getDescription(),
+                    ]);
+                }
             }
         }
 

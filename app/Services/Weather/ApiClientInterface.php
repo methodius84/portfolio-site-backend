@@ -2,9 +2,9 @@
 
 namespace App\Services\Weather;
 
-use App\DTO\Weather\QueryParamsDTO;
+use App\DTO\Weather\QueryDTO\BuildQueryInterface;
 
 interface ApiClientInterface
 {
-    public function execute(QueryParamsDTO $params);
+    public function execute(BuildQueryInterface $params);
 }

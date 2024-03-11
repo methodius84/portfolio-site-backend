@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Weather\SharedDTO;
+namespace App\DTO\Weather\ResponseDTO\Weather\SharedDTO;
 
 use stdClass;
 

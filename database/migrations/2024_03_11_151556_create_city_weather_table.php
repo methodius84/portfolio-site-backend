@@ -11,26 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('weather.city_forecasts', function (Blueprint $table) {
+        Schema::create('weather.city_weather', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->bigInteger('date')->comment('За какое время прогноз');
             $table->decimal('temperature');
-            $table->decimal('feels_like');
+            $table->decimal('feels_like')->comment('Ощущается как');
             $table->decimal('temp_min');
             $table->decimal('temp_max');
             $table->integer('pressure');
-            $table->smallInteger('humidity');
-            $table->smallInteger('cloudiness')->comment('Облачность, в %');
+            $table->integer('humidity');
+            $table->integer('cloudiness')->comment('Облачность, в %');
             $table->decimal('wind_speed');
             $table->integer('wind_degree');
-            $table->decimal('wind_gust')->nullable();
-            $table->enum('daytime',['d','n'])->comment('Время суток');
+            $table->decimal('wind_gust')->nullable()->comment('Порыв ветра.');
             $table->integer('visibility');
-            $table->smallInteger('pop')->comment('Вероятность осадков');
-            $table->string('weather');
-            $table->string('weather_description');
+            $table->string('weather')->comment('Описание погоды. Главное');
+            $table->string('weather_description')->comment('Погода текстом подробнее');
             $table->foreignUuid('city_uuid')->constrained('weather.cities', 'uuid');
-            $table->index(['city_uuid', 'date']);
+            $table->unique('city_uuid');
             $table->timestamps();
         });
     }
@@ -40,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('weather.city_forecasts');
+        Schema::dropIfExists('weather.city_weather');
     }
 };

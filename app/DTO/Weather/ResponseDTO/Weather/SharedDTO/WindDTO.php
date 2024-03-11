@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Weather\SharedDTO;
+namespace App\DTO\Weather\ResponseDTO\Weather\SharedDTO;
 
 class WindDTO
 {
@@ -32,9 +32,9 @@ class WindDTO
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getGust(): float
+    public function getGust(): ?float
     {
         return $this->gust;
     }

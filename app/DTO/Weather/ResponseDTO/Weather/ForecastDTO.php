@@ -1,14 +1,17 @@
 <?php
 
-namespace App\DTO\Weather;
+namespace App\DTO\Weather\ResponseDTO\Weather;
 
-use App\DTO\Weather\SharedDTO\CityDTO;
-use App\DTO\Weather\SharedDTO\WeatherInfoDTO;
+use App\DTO\Weather\ResponseDTO\Weather\SharedDTO\CityDTO;
+use App\DTO\Weather\ResponseDTO\Weather\SharedDTO\WeatherInfoDTO;
 
 class ForecastDTO
 {
     private readonly string $code;
     private readonly int $count;
+    /**
+     * @var array<WeatherInfoDTO>|null
+     */
     private ?array $weatherInfos;
 
     private ?CityDTO $city;

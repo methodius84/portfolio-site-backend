@@ -1,15 +1,14 @@
 <?php
 
-namespace App\DTO\Weather;
+namespace App\DTO\Weather\ResponseDTO\Weather;
 
-use App\DTO\Weather\SharedDTO\WeatherInfoDTO;
+use App\DTO\Weather\ResponseDTO\Weather\SharedDTO\WeatherInfoDTO;
 use stdClass;
 
 class CurrentWeatherDTO
 {
     private readonly int $code;
     private readonly stdClass $coordinates;
-    private readonly int $timestamp;
     private readonly ?int $timezone;
     private readonly ?string $cityName;
     private readonly ?string $country;
@@ -21,7 +20,6 @@ class CurrentWeatherDTO
     {
         $this->code = $response->cod;
         $this->coordinates = $response->coord;
-        $this->timestamp = $response->dt;
         $this->timezone = $response->timezone ?? null;
         $this->cityName = $response->name ?? null;
         $this->country = $response->sys->country ?? null;
@@ -46,11 +44,6 @@ class CurrentWeatherDTO
     public function getCoordinates(): stdClass
     {
         return $this->coordinates;
-    }
-
-    public function getTimestamp(): int
-    {
-        return $this->timestamp;
     }
 
     public function getTimezone(): ?int
