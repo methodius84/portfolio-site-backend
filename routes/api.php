@@ -25,5 +25,6 @@ Route::prefix('v1')->group(function () {
         Route::get('cities', function () {
             return new CityCollection(City::all());
         })->name('cities');
+        Route::get('forecast/{id}')->name('forecast');
     });
 });
