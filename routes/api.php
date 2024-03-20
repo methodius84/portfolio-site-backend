@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Weather\ApiController;
 use App\Http\Resources\CityCollection;
 use App\Models\Weather\City;
 use Illuminate\Http\Request;
@@ -25,6 +26,6 @@ Route::prefix('v1')->group(function () {
         Route::get('cities', function () {
             return new CityCollection(City::all());
         })->name('cities');
-        Route::get('forecast/{id}')->name('forecast');
+        Route::get('forecast/{id}', [ApiController::class, 'getWeather'])->name('forecast');
     });
 });
