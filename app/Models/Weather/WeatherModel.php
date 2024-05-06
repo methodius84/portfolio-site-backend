@@ -15,7 +15,7 @@ class WeatherModel extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($model) {
             $model->uuid = Str::uuid();

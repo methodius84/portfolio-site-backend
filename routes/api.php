@@ -27,5 +27,6 @@ Route::prefix('v1')->group(function () {
             return new CityCollection(City::all());
         })->name('cities');
         Route::get('forecast/{id}', [ApiController::class, 'getWeather'])->name('forecast');
+        Route::get('search', [ApiController::class, 'search'])->name('search');
     });
 });
